@@ -15,15 +15,16 @@ export const metadata: Metadata = {
     siteName: 'JimmyDC Blog Post Summarizer',
     images: [
       {
-        url: 'https://nextjs.org/og.png',
+        url: '/images/swash-og-800x600.png',
         width: 800,
         height: 600,
+        alt: "OpenGraph image for 'Swashbuckling with Code' blog featuring a dark, moody pirate theme. In the center, a quill writes code on parchment atop an antique desk. Surrounding the parchment are elements of old and modern navigation: a ship's wheel intertwined with digital gears and circuitry. The aesthetic blends the adventure of piracy with the precision of software development.",
       },
       {
-        url: 'https://nextjs.org/og-alt.png',
-        width: 1800,
-        height: 1600,
-        alt: 'My custom alt',
+        url: '/images/swash-og-1152x1024.png',
+        width: 1152,
+        height: 1024,
+        alt: "OpenGraph image for 'Swashbuckling with Code' blog featuring a dark, moody pirate theme. In the center, a quill writes code on parchment atop an antique desk. Surrounding the parchment are elements of old and modern navigation: a ship's wheel intertwined with digital gears and circuitry. The aesthetic blends the adventure of piracy with the precision of software development.",
       },
     ],
     locale: 'en_US',
