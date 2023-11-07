@@ -22,13 +22,11 @@ export default function Home() {
             const data = await res.json()
             setSummary(data.summary)
           } catch (err) {
-            console.log("is error event?", typeof err, err instanceof Error)
             if (err instanceof Error) {
               setError(err.message)
             } else {
               setError(String(err))
             }
-            console.error(err)
           }
         }}
         className="flex flex-col items-center justify-center w-full max-w-2xl"
