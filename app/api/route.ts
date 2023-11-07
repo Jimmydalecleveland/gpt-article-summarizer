@@ -1,4 +1,9 @@
+import OpenAI from 'openai'
 import { parse } from 'node-html-parser'
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
 
 export async function GET() {
   try {
@@ -9,7 +14,17 @@ export async function GET() {
     const title = root.querySelector('title')?.text
     const body = root.querySelector('body')?.text
 
-    return Response.json({ title: title, body: body })
+    const chatCompletion = await openai.chat.completions.create({
+      messages: [{
+        role: 'user',
+        content: `Summarize the following article for me. The title is: ${title}, and the body is ${body}`,
+      }],
+      model: 'gpt-3.5-turbo-1106',
+    })
+
+    console.dir(chatCompletion, { depth: null })
+
+    return Response.json({ summary: chatCompletion.choices[0] })
   } catch (err) {
     return Response.json({ error: err })
   }
