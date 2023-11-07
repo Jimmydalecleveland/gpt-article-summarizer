@@ -17,8 +17,9 @@ export async function GET() {
     const chatCompletion = await openai.chat.completions.create({
       messages: [{
         role: 'user',
-        content: `Summarize the following article for me. The title is: ${title}, and the body is ${body}`,
+        content: `Summarize the following article for me using the first person point of view. The author is always Jimmy Cleveland. The title is: ${title}, and the body is ${body}`,
       }],
+      // New model as of 2023-11-06
       model: 'gpt-3.5-turbo-1106',
     })
 
