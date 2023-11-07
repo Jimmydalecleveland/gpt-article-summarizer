@@ -25,7 +25,7 @@ export async function GET() {
 
     console.dir(chatCompletion, { depth: null })
 
-    return Response.json({ summary: chatCompletion.choices[0] })
+    return Response.json({ summary: chatCompletion.choices[0].message.content })
   } catch (err) {
     return Response.json({ error: err })
   }
