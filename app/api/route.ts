@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
   let parsedUrl: URL
   try {
     parsedUrl = new URL(url)
-  } catch (err) {
+  } catch (_) {
     return new Response('Invalid URL.', { status: 400 })
   }
 
