@@ -91,6 +91,8 @@ export function Summarizer() {
           name="url"
           type="text"
           className="text-black rounded-lg p-2 m-2 self-stretch"
+          defaultValue="https://blog.jimmydc.com/git-bisect/"
+          required
         />
         {/* space character to avoid jumping button upon error render */}
         <p className="text-red-500">&nbsp;{state.error}</p>
