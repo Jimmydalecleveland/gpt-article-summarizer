@@ -4,14 +4,12 @@ import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
-// @TODO - Update with real metadata and images
 export const metadata: Metadata = {
   title: 'JimmyDC Blog Post Summarizer',
   description: 'Get a short summary of any blog post on blog.jimmydc.com',
   openGraph: {
     title: 'JimmyDC Blog Post Summarizer',
     description: 'Get a short summary of any blog post on blog.jimmydc.com',
-    url: 'https://blog.jimmydc.com/summarizer',
     siteName: 'JimmyDC Blog Post Summarizer',
     images: [
       {
@@ -30,10 +28,6 @@ export const metadata: Metadata = {
     locale: 'en_US',
     type: 'website',
   },
-  // @TODO - Add Twitter metadata
-  // twitter: {
-  //   handle: '@jimmydc',
-  // }
 }
 
 export default function RootLayout({
