@@ -52,7 +52,8 @@ export function Summarizer() {
 
       const res = await fetch(`/api?url=${url}`)
       if (!res.ok || !res.body) {
-        throw new Error(`Unexpected response: ${res.statusText}`)
+        const errorMessage = await res.text()
+        throw new Error(errorMessage)
       }
       const runner = ChatCompletionStream.fromReadableStream(res.body)
 
@@ -91,6 +92,8 @@ export function Summarizer() {
           name="url"
           type="text"
           className="text-black rounded-lg p-2 m-2 self-stretch"
+          placeholder="https://blog.jimmydc.com/git-bisect/"
+          required
         />
         {/* space character to avoid jumping button upon error render */}
         <p className="text-red-500">&nbsp;{state.error}</p>
