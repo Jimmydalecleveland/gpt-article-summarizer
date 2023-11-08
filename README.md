@@ -8,9 +8,12 @@ that summarizes some content.
 This could definitely be used for any articles, I'm just keeping it specific for 
 the sake of simplicity. 
 
+Hosted at: [](https://gpt-article-summarizer.vercel.app/)
+
 ### To run locally
 You will need a `.env.local` with the openai API key. See the `.env.example`.
 
 ```bash
 npm run dev
 ```
+
