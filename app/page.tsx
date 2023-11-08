@@ -1,10 +1,12 @@
 'use client'
 import * as React from "react"
+import { ChatCompletionStream } from "openai/lib/ChatCompletionStream"
 import invariant from 'tiny-invariant'
 
 export default function Home() {
   const [summary, setSummary] = React.useState('')
   const [error, setError] = React.useState<string | null>(null)
+  const [isLoading, setIsLoading] = React.useState(false)
 
   return (
     <main className="flex flex-col gap-24 items-center justify-between pt-24">
@@ -18,9 +20,28 @@ export default function Home() {
             const url = formData.get('url')
             invariant(typeof url === 'string', 'Expected a string for url')
 
+            setIsLoading(true)
+            setError(null)
+            setSummary(' ') // Space so we always render "Summary:" title after first attempt
             const res = await fetch(`/api?url=${url}`)
-            const data = await res.json()
-            setSummary(data.summary)
+            if (!res.ok || !res.body) {
+              throw new Error(`Unexpected response: ${res.statusText}`)
+            }
+            const runner = ChatCompletionStream.fromReadableStream(res.body)
+
+            /**
+             * As each chunk of the stream comes in, we can simply update state
+             * with the snapshot as it is what we have received so far. The delta
+             * is the difference between the previous snapshot and the current
+             * snapshot.
+             */
+            runner.on('content', (_delta, snapshot) => {
+              setSummary(snapshot)
+            })
+
+            // Wait for the stream to finish to unset the loading state
+            await runner.finalChatCompletion()
+            setIsLoading(false)
           } catch (err) {
             if (err instanceof Error) {
               setError(err.message)
@@ -51,7 +72,7 @@ export default function Home() {
       {/* Summary */}
       {summary && (
         <div className="flex flex-col items-center justify-center w-full max-w-2xl">
-          <h2 className="text-2xl">Summary:</h2>
+          <h2 className="text-2xl">Summary: {isLoading && "Loading..."}</h2>
           <p className="text-xl">{summary}</p>
         </div>
       )}

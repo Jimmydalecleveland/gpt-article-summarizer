@@ -14,7 +14,8 @@ export async function GET() {
     const title = root.querySelector('title')?.text
     const body = root.querySelector('body')?.text
 
-    const chatCompletion = await openai.chat.completions.create({
+    const completion = await openai.chat.completions.create({
+      stream: true,
       messages: [{
         role: 'user',
         content: `Summarize the following article for me using the first person point of view. The author is always Jimmy Cleveland. The title is: ${title}, and the body is ${body}`,
@@ -23,9 +24,7 @@ export async function GET() {
       model: 'gpt-3.5-turbo-1106',
     })
 
-    console.dir(chatCompletion, { depth: null })
-
-    return Response.json({ summary: chatCompletion.choices[0].message.content })
+    return new Response(completion.toReadableStream())
   } catch (err) {
     return Response.json({ error: err })
   }
