@@ -2,6 +2,8 @@ import OpenAI from 'openai'
 import { parse } from 'node-html-parser'
 import type { NextRequest } from 'next/server'
 
+export const runtime = 'edge'
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
