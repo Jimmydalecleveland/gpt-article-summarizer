@@ -52,7 +52,8 @@ export function Summarizer() {
 
       const res = await fetch(`/api?url=${url}`)
       if (!res.ok || !res.body) {
-        throw new Error(`Unexpected response: ${res.statusText}`)
+        const errorMessage = await res.text()
+        throw new Error(errorMessage)
       }
       const runner = ChatCompletionStream.fromReadableStream(res.body)
 

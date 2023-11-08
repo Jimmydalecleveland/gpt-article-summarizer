@@ -6,11 +6,29 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
+const allowedDomain = 'https://blog.jimmydc.com'
+
 export async function GET(request: NextRequest) {
+  // Get Search Param URL to scrape and ensure it exists.
   const searchParams = request.nextUrl.searchParams
   const url = searchParams.get('url')
   if (!url) {
-    return new Response('Please provide a url query parameter', { status: 400 })
+    return new Response('Please provide a full URL (including "https://").', { status: 400 })
+  }
+
+  // Parse the URL and ensure it is a valid URL.
+  let parsedUrl: URL
+  try {
+    parsedUrl = new URL(url)
+  } catch (err) {
+    return new Response('Invalid URL.', { status: 400 })
+  }
+
+  if (parsedUrl.origin !== allowedDomain) {
+    return new Response(
+      'Invalid domain. Only `https://blog.jimmydc.com` is allowed.', 
+      { status: 400 }
+    )
   }
 
   try {
