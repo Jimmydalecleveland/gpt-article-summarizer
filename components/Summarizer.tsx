@@ -3,10 +3,43 @@ import * as React from 'react'
 import { ChatCompletionStream } from "openai/lib/ChatCompletionStream"
 import invariant from 'tiny-invariant'
 
+type State = {
+  summary: string
+  error: string | null
+  isLoading: boolean
+}
+
+type Action = 
+  | { type: 'start' }
+  | { type: 'update', payload: string }
+  | { type: 'success' }
+  | { type: 'error', payload: string }
+
+const initialState: State = {
+  summary: '',
+  error: null,
+  isLoading: false,
+}
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'start':
+      // The `summary` has a space in the string for truthy checks to
+      // always show the Summary title after the first submission attempt.
+      return { ...state, isLoading: true, error: null, summary: ' ' }
+    case 'update':
+      return { ...state, summary: action.payload }
+    case 'success':
+      return { ...state, isLoading: false }
+    case 'error':
+      return { ...state, isLoading: false, error: action.payload }
+    default:
+      throw new Error('Unknown action type')
+  }
+}
+
 export function Summarizer() {
-  const [summary, setSummary] = React.useState('')
-  const [error, setError] = React.useState<string | null>(null)
-  const [isLoading, setIsLoading] = React.useState(false)
+  const [state, dispatch] = React.useReducer(reducer, initialState)
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -15,9 +48,8 @@ export function Summarizer() {
       const url = formData.get('url')
       invariant(typeof url === 'string', 'Expected a string for url')
 
-      setIsLoading(true)
-      setError(null)
-      setSummary(' ') // Space so we always render "Summary:" title after first attempt
+      dispatch({ type: 'start' })
+
       const res = await fetch(`/api?url=${url}`)
       if (!res.ok || !res.body) {
         throw new Error(`Unexpected response: ${res.statusText}`)
@@ -31,17 +63,18 @@ export function Summarizer() {
        * snapshot.
        */
       runner.on('content', (_delta, snapshot) => {
-        setSummary(snapshot)
+        dispatch({ type: 'update', payload: snapshot })
       })
 
       // Wait for the stream to finish to unset the loading state
       await runner.finalChatCompletion()
-      setIsLoading(false)
+      dispatch({ type: 'success' })
+
     } catch (err) {
       if (err instanceof Error) {
-        setError(err.message)
+        dispatch({ type: 'error', payload: err.message })
       } else {
-        setError(String(err))
+        dispatch({ type: 'error', payload: String(err) })
       }
     }
   }
@@ -60,7 +93,7 @@ export function Summarizer() {
           className="text-black rounded-lg p-2 m-2 self-stretch"
         />
         {/* space character to avoid jumping button upon error render */}
-        <p className="text-red-500">&nbsp;{error}</p>
+        <p className="text-red-500">&nbsp;{state.error}</p>
         <button
           type="submit"
           className="border-2 border-white rounded-lg p-2 m-2"
@@ -70,10 +103,10 @@ export function Summarizer() {
       </form>
 
       {/* Summary */}
-      {summary && (
+      {state.summary && (
         <div className="flex flex-col items-center justify-center w-full max-w-2xl">
-          <h2 className="text-2xl">Summary: {isLoading && "Loading..."}</h2>
-          <p className="text-xl">{summary}</p>
+          <h2 className="text-2xl">Summary: {state.isLoading && "Loading..."}</h2>
+          <p className="text-xl">{state.summary}</p>
         </div>
       )}
     </>
