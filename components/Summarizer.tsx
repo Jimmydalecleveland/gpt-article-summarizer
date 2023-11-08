@@ -8,46 +8,48 @@ export function Summarizer() {
   const [error, setError] = React.useState<string | null>(null)
   const [isLoading, setIsLoading] = React.useState(false)
 
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    try {
+      const formData = new FormData(event.currentTarget)
+      const url = formData.get('url')
+      invariant(typeof url === 'string', 'Expected a string for url')
+
+      setIsLoading(true)
+      setError(null)
+      setSummary(' ') // Space so we always render "Summary:" title after first attempt
+      const res = await fetch(`/api?url=${url}`)
+      if (!res.ok || !res.body) {
+        throw new Error(`Unexpected response: ${res.statusText}`)
+      }
+      const runner = ChatCompletionStream.fromReadableStream(res.body)
+
+      /**
+       * As each chunk of the stream comes in, we can simply update state
+       * with the snapshot as it is what we have received so far. The delta
+       * is the difference between the previous snapshot and the current
+       * snapshot.
+       */
+      runner.on('content', (_delta, snapshot) => {
+        setSummary(snapshot)
+      })
+
+      // Wait for the stream to finish to unset the loading state
+      await runner.finalChatCompletion()
+      setIsLoading(false)
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError(String(err))
+      }
+    }
+  }
+
   return (
     <>
       <form
-        onSubmit={async (event) => {
-          event.preventDefault()
-          try {
-            const formData = new FormData(event.currentTarget)
-            const url = formData.get('url')
-            invariant(typeof url === 'string', 'Expected a string for url')
-
-            setIsLoading(true)
-            setError(null)
-            setSummary(' ') // Space so we always render "Summary:" title after first attempt
-            const res = await fetch(`/api?url=${url}`)
-            if (!res.ok || !res.body) {
-              throw new Error(`Unexpected response: ${res.statusText}`)
-            }
-            const runner = ChatCompletionStream.fromReadableStream(res.body)
-
-            /**
-             * As each chunk of the stream comes in, we can simply update state
-             * with the snapshot as it is what we have received so far. The delta
-             * is the difference between the previous snapshot and the current
-             * snapshot.
-             */
-            runner.on('content', (_delta, snapshot) => {
-              setSummary(snapshot)
-            })
-
-            // Wait for the stream to finish to unset the loading state
-            await runner.finalChatCompletion()
-            setIsLoading(false)
-          } catch (err) {
-            if (err instanceof Error) {
-              setError(err.message)
-            } else {
-              setError(String(err))
-            }
-          }
-        }}
+        onSubmit={handleSubmit}
         className="flex flex-col items-center justify-center w-full max-w-2xl"
       >
         <label htmlFor="url" className="text-2xl">Enter a URL:</label>
