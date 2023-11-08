@@ -17,3 +17,9 @@ You will need a `.env.local` with the openai API key. See the `.env.example`.
 npm run dev
 ```
 
+### Notes about the project
+- Uses OpenAI's latest "cheap and fast" model (as of Nov 06, 2023): `gpt-3.5-turbo-1106`
+- Uses OpenAI's streaming methods through their npm package.
+- You could accomplish this functionality much easier with Vercel's `useChat`, I just wanted to see some of what was involved without it.
+- `useReducer` is used for state management here, but debateably overkill. I just prefer it when multiple states are commonly updated together. 
+
